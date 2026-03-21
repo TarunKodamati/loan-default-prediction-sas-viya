@@ -29,3 +29,5 @@ acc_open_past_24mths – Accounts opened in the last 24 months
 
 ## Summary
 These variables were selected based on their contribution to model performance and their relevance in explaining borrower risk. They help in identifying patterns associated with loan defaults and improve the model’s predictive accuracy.
+
+<img width="1757" height="848" alt="image" src="https://github.com/user-attachments/assets/537bdc25-3363-4fd6-bb26-469d95811c1f" />
