@@ -31,6 +31,7 @@ To build a predictive model that classifies borrowers into:
 - Dataset contains borrower financial and credit-related features  
 
 ### Key Variables
+[key variables](Keyvariables.md)
 
 - dti → Debt-to-Income ratio  
 - revol_util → Credit utilization  
