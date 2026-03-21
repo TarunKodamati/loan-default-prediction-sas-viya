@@ -25,7 +25,7 @@ To build a predictive model that classifies borrowers into:
 
 ##  Dataset Information
 
-[View Dataset Description](dataset.md)
+[View Dataset Description](DATASET.md)
 - Source: LendingClub  
 - Time Period: 2017–2018  
 - Dataset contains borrower financial and credit-related features  
