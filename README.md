@@ -83,7 +83,6 @@ To build a predictive model that classifies borrowers into:
 - Higher DTI → higher default risk  
 - Higher credit utilization → financial stress  
 - Past delinquencies strongly impact default  
-- Lower FICO score → higher probability of default  
 
 ---
 
