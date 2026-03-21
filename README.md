@@ -68,7 +68,7 @@ To build a predictive model that classifies borrowers into:
 ---
 
 ##  Model Performance
-[model](model.md)
+[model](Model.md)
 - Evaluated using:
   - ROC Curve  
   - AUC (Area Under Curve)  
