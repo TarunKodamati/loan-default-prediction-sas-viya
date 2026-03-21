@@ -42,6 +42,7 @@ To build a predictive model that classifies borrowers into:
 ---
 
 ##  Data Preprocessing
+[Datapreprocessing](Datapreprocessing.md)
 
 - Removed data leakage variables (e.g., total_pymnt, recoveries)  
 - Handled missing values  
