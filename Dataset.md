@@ -41,8 +41,8 @@
 | revol_util                     | Revolving credit utilization percentage               | Input                   | Interval |
 | total_acc                      | Total number of credit accounts                       | Input                   | Interval |
 | initial_list_status            | Initial listing status of loan                        | Input                   | Nominal  |
-| out_prncp                      | Remaining principal balance                           | Reject (data leakage)   | Interval |
-| total_pymnt                    | Total payment received so far                         | Reject (data leakage)   | Interval |
+| out_prncp                      | Remaining principal balance                           | Reject                  | Interval |
+| total_pymnt                    | Total payment received so far                         | Reject                  | Interval |
 | total_rec_prncp                | Principal received to date                            | Reject                  | Interval |
 | total_rec_int                  | Interest received to date                             | Reject                  | Interval |
 | total_rec_late_fee             | Late fees received                                    | Reject                  | Interval |
