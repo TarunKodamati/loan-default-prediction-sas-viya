@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LoanIQ — Eligibility Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f2eb;
+    --cream: #ede9de;
+    --accent: #c8ff00;
+    --accent-dark: #8fb800;
+    --muted: #7a7670;
+    --border: #d4cfc4;
+    --white: #ffffff;
+    --success-bg: #edfce8;
+    --success: #1a7a3c;
+    --danger-bg: #fceaea;
+    --danger: #a01c1c;
+    --card: #ffffff;
+    --radius: 16px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(200,255,0,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(13,13,13,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 3rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--paper);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-dot {
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--ink);
+    color: var(--accent);
+    padding: 4px 12px;
+    border-radius: 100px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 5rem 2rem 3rem;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.0;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+  }
+
+  .hero h1 span {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--accent);
+    padding: 0 12px;
+    border-radius: 8px;
+    transform: rotate(-1deg);
+  }
+
+  .hero p {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ── STEPS BAR ── */
+  .steps-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 400;
+    padding: 0 1.5rem;
+    border-right: 1px solid var(--border);
+  }
+  .step-item:last-child { border-right: none; }
+  .step-item.active { color: var(--ink); font-weight: 500; }
+  .step-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .step-item.active .step-num {
+    background: var(--ink);
+    color: var(--accent);
+  }
+  .step-item.done .step-num {
+    background: var(--accent);
+    color: var(--ink);
+  }
+
+  /* ── FORM WRAPPER ── */
+  .form-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 1.5rem 6rem;
+  }
+
+  /* ── SECTION CARD ── */
+  .section-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem 2.5rem;
+    margin-bottom: 1.25rem;
+    transition: box-shadow 0.2s;
+  }
+  .section-card:focus-within {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 640px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    header { padding: 1rem 1.5rem; }
+    .section-card { padding: 1.5rem; }
+  }
+
+  /* ── FIELD ── */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  input, select {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--ink);
+    background: var(--white);
+  }
+
+  input::placeholder { color: #bbb9b3; }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7670' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  .field-hint {
+    font-size: 11px;
+    color: #b0aca5;
+    margin-top: 2px;
+  }
+
+  /* ── SUBMIT BUTTON ── */
+  .submit-area {
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  .btn-submit {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    background: var(--ink);
+    color: var(--accent);
+    border: none;
+    border-radius: 100px;
+    padding: 16px 48px;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-submit:hover { transform: translateY(-2px); background: #1a1a1a; }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-arrow {
+    width: 20px; height: 20px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── RESULT ── */
+  #result-section {
+    display: none;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 1.5rem 6rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .result-card {
+    border-radius: var(--radius);
+    padding: 3rem 2.5rem;
+    text-align: center;
+    border: 1px solid;
+    position: relative;
+    overflow: hidden;
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-card.approved {
+    background: var(--success-bg);
+    border-color: #a8e8be;
+  }
+
+  .result-card.rejected {
+    background: var(--danger-bg);
+    border-color: #f0b8b8;
+  }
+
+  .result-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 1.5rem;
+  }
+
+  .approved .result-icon { background: #c6f5d5; }
+  .rejected .result-icon { background: #fad5d5; }
+
+  .result-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.5rem;
+  }
+
+  .approved .result-title { color: var(--success); }
+  .rejected .result-title { color: var(--danger); }
+
+  .result-subtitle {
+    font-size: 1rem;
+    font-weight: 300;
+    margin-bottom: 2rem;
+    color: var(--muted);
+  }
+
+  .prob-bar-wrap {
+    max-width: 360px;
+    margin: 0 auto 2rem;
+  }
+
+  .prob-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .prob-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .prob-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .approved .prob-fill { background: var(--success); }
+  .rejected .prob-fill { background: var(--danger); }
+
+  .result-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+    text-align: left;
+  }
+
+  .detail-item {
+    background: rgba(255,255,255,0.7);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+  }
+
+  .detail-label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .detail-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .btn-reset {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 10px 28px;
+    cursor: pointer;
+    margin-top: 2rem;
+    transition: all 0.15s;
+  }
+  .btn-reset:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* ── LOADING ── */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(245,242,235,0.85);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+    backdrop-filter: blur(4px);
+  }
+  .loading-overlay.active { display: flex; }
+
+  .spinner {
+    width: 48px; height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--ink);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  .loading-sub {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 2rem;
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  footer strong { color: var(--ink); }
+
+  /* ── VALIDATION ── */
+  input.error, select.error { border-color: #e05555; }
+  .error-msg { font-size: 11px; color: #e05555; margin-top: 2px; display: none; }
+  .error-msg.show { display: block; }
+
+  /* ── NOTE BOX ── */
+  .api-note {
+    background: var(--cream);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .api-note strong { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Analyzing your application</div>
+  <div class="loading-sub">Running SAS Viya ML model…</div>
+</div>
+
+<!-- Header -->
+<header>
+  <div class="logo">
+    <span class="logo-dot"></span>
+    LoanIQ
+  </div>
+  <span class="badge">Powered by SAS Viya ML</span>
+</header>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-tag">Instant Decision · No Credit Impact</div>
+  <h1>Check if you qualify<br/>for a <span>loan</span></h1>
+  <p>Answer a few questions and our machine learning model will assess your eligibility in seconds.</p>
+</div>
+
+<!-- Steps -->
+<div class="steps-bar">
+  <div class="step-item active" id="step1-ind">
+    <div class="step-num">1</div> Your Profile
+  </div>
+  <div class="step-item" id="step2-ind">
+    <div class="step-num">2</div> Loan Details
+  </div>
+  <div class="step-item" id="step3-ind">
+    <div class="step-num">3</div> Credit History
+  </div>
+  <div class="step-item" id="step4-ind">
+    <div class="step-num">4</div> Result
+  </div>
+</div>
+
+<!-- Form -->
+<div class="form-wrapper" id="formSection">
+
+  <div class="api-note">
+    <span>⚙️</span>
+    <span><strong>Developer note:</strong> Replace the <code>SAS_VIYA_API_URL</code> constant at the bottom of this file with your SAS Model Manager MAS endpoint to connect to your real model.</span>
+  </div>
+
+  <form id="loanForm" novalidate>
+
+    <!-- Section 1: Personal -->
+    <div class="section-card">
+      <div class="section-title">Personal Information</div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="emp_length">Employment Length</label>
+          <select id="emp_length" name="emp_length" required>
+            <option value="">Select employment length</option>
+            <option value="< 1 year">Less than 1 year</option>
+            <option value="1 year">1 year</option>
+            <option value="2 years">2 years</option>
+            <option value="3 years">3 years</option>
+            <option value="4 years">4 years</option>
+            <option value="5 years">5 years</option>
+            <option value="6 years">6 years</option>
+            <option value="7 years">7 years</option>
+            <option value="8 years">8 years</option>
+            <option value="9 years">9 years</option>
+            <option value="10+ years">10+ years</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="home_ownership">Home Ownership</label>
+          <select id="home_ownership" name="home_ownership" required>
+            <option value="">Select ownership status</option>
+            <option value="RENT">Rent</option>
+            <option value="OWN">Own</option>
+            <option value="MORTGAGE">Mortgage</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="annual_inc">Annual Income ($)</label>
+          <input type="number" id="annual_inc" name="annual_inc" placeholder="e.g. 65000" min="0" required/>
+        </div>
+        <div class="field">
+          <label for="verification_status">Income Verification</label>
+          <select id="verification_status" name="verification_status" required>
+            <option value="">Select verification status</option>
+            <option value="Not Verified">Not Verified</option>
+            <option value="Verified">Verified</option>
+            <option value="Source Verified">Source Verified</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Loan Details -->
+    <div class="section-card">
+      <div class="section-title">Loan Details</div>
+      <div class="grid-3">
+        <div class="field">
+          <label for="loan_amnt">Loan Amount ($)</label>
+          <input type="number" id="loan_amnt" name="loan_amnt" placeholder="e.g. 15000" min="1000" max="40000" required/>
+          <span class="field-hint">$1,000 – $40,000</span>
+        </div>
+        <div class="field">
+          <label for="term">Loan Term</label>
+          <select id="term" name="term" required>
+            <option value="">Select term</option>
+            <option value="36 months">36 Months</option>
+            <option value="60 months">60 Months</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="int_rate">Interest Rate (%)</label>
+          <input type="number" id="int_rate" name="int_rate" placeholder="e.g. 12.5" step="0.01" min="1" max="35" required/>
+        </div>
+        <div class="field">
+          <label for="purpose">Loan Purpose</label>
+          <select id="purpose" name="purpose" required>
+            <option value="">Select purpose</option>
+            <option value="Business">Business</option>
+            <option value="Home improvement">Home Improvement</option>
+            <option value="Medical expenses">Medical Expenses</option>
+            <option value="Moving and relocation">Moving / Relocation</option>
+            <option value="Debt consolidation">Debt Consolidation</option>
+            <option value="Education">Education</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="sub_grade">Loan Sub Grade</label>
+          <select id="sub_grade" name="sub_grade" required>
+            <option value="">Select sub grade</option>
+            <option value="A1">A1</option><option value="A2">A2</option><option value="A3">A3</option><option value="A4">A4</option><option value="A5">A5</option>
+            <option value="B1">B1</option><option value="B2">B2</option><option value="B3">B3</option><option value="B4">B4</option><option value="B5">B5</option>
+            <option value="C1">C1</option><option value="C2">C2</option><option value="C3">C3</option><option value="C4">C4</option><option value="C5">C5</option>
+            <option value="D1">D1</option><option value="D2">D2</option><option value="D3">D3</option><option value="D4">D4</option><option value="D5">D5</option>
+            <option value="E1">E1</option><option value="E2">E2</option><option value="E3">E3</option><option value="E4">E4</option><option value="E5">E5</option>
+            <option value="F1">F1</option><option value="F2">F2</option><option value="F3">F3</option><option value="F4">F4</option><option value="F5">F5</option>
+            <option value="G1">G1</option><option value="G2">G2</option><option value="G3">G3</option><option value="G4">G4</option><option value="G5">G5</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="dti">Debt-to-Income Ratio (%)</label>
+          <input type="number" id="dti" name="dti" placeholder="e.g. 18.5" step="0.01" min="0" max="100" required/>
+          <span class="field-hint">Monthly debt / monthly income × 100</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Credit History -->
+    <div class="section-card">
+      <div class="section-title">Credit History</div>
+      <div class="grid-3">
+        <div class="field">
+          <label for="fico_score">FICO Credit Score</label>
+          <input type="number" id="fico_score" name="fico_score" placeholder="e.g. 720" min="300" max="850" required/>
+          <span class="field-hint">300 – 850</span>
+        </div>
+        <div class="field">
+          <label for="credit_history_years">Credit History (years)</label>
+          <input type="number" id="credit_history_years" name="credit_history_years" placeholder="e.g. 8" min="0" max="50" required/>
+        </div>
+        <div class="field">
+          <label for="inq_last_6mths">Credit Inquiries (6 months)</label>
+          <input type="number" id="inq_last_6mths" name="inq_last_6mths" placeholder="e.g. 2" min="0" max="20" required/>
+        </div>
+        <div class="field">
+          <label for="open_acc">Open Accounts</label>
+          <input type="number" id="open_acc" name="open_acc" placeholder="e.g. 7" min="0" required/>
+        </div>
+        <div class="field">
+          <label for="total_acc">Total Accounts</label>
+          <input type="number" id="total_acc" name="total_acc" placeholder="e.g. 15" min="0" required/>
+        </div>
+        <div class="field">
+          <label for="mort_acc">Mortgage Accounts</label>
+          <input type="number" id="mort_acc" name="mort_acc" placeholder="e.g. 1" min="0" required/>
+        </div>
+        <div class="field">
+          <label for="revol_bal">Revolving Balance ($)</label>
+          <input type="number" id="revol_bal" name="revol_bal" placeholder="e.g. 8000" min="0" required/>
+        </div>
+        <div class="field">
+          <label for="revol_util">Revolving Utilization (%)</label>
+          <input type="number" id="revol_util" name="revol_util" placeholder="e.g. 45.2" step="0.1" min="0" max="100" required/>
+        </div>
+        <div class="field">
+          <label for="num_rev_tl_bal_gt_0">Revolving Accts w/ Balance</label>
+          <input type="number" id="num_rev_tl_bal_gt_0" name="num_rev_tl_bal_gt_0" placeholder="e.g. 4" min="0" required/>
+        </div>
+        <div class="field">
+          <label for="tot_hi_cred_lim">Total High Credit Limit ($)</label>
+          <input type="number" id="tot_hi_cred_lim" name="tot_hi_cred_lim" placeholder="e.g. 50000" min="0" required/>
+        </div>
+        <div class="field">
+          <label for="delinq_2yrs">Delinquencies (2 years)</label>
+          <input type="number" id="delinq_2yrs" name="delinq_2yrs" placeholder="e.g. 0" min="0" required/>
+        </div>
+        <div class="field">
+          <label for="pub_rec">Public Records</label>
+          <input type="number" id="pub_rec" name="pub_rec" placeholder="e.g. 0" min="0" required/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Additional -->
+    <div class="section-card">
+      <div class="section-title">Additional Info</div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="issue_month">Application Month</label>
+          <select id="issue_month" name="issue_month" required>
+            <option value="">Select month</option>
+            <option value="1">January</option><option value="2">February</option>
+            <option value="3">March</option><option value="4">April</option>
+            <option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option>
+            <option value="9">September</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="issue_year">Application Year</label>
+          <input type="number" id="issue_year" name="issue_year" placeholder="e.g. 2024" min="2010" max="2030" required/>
+        </div>
+        <div class="field">
+          <label for="mths_since_recent_bc">Months Since Recent Bank Card</label>
+          <input type="number" id="mths_since_recent_bc" name="mths_since_recent_bc" placeholder="e.g. 6" min="0" required/>
+        </div>
+        <div class="field">
+          <label for="bc_open_to_buy">Bank Card Open to Buy ($)</label>
+          <input type="number" id="bc_open_to_buy" name="bc_open_to_buy" placeholder="e.g. 5000" min="0" required/>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <button type="submit" class="btn-submit" id="submitBtn">
+        Check My Eligibility
+        <span class="btn-arrow">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M2 5h6M5 2l3 3-3 3" stroke="#0d0d0d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </button>
+      <p style="font-size:12px;color:var(--muted);margin-top:1rem;">This check does not affect your credit score.</p>
+    </div>
+
+  </form>
+</div>
+
+<!-- Result Section -->
+<div id="result-section">
+  <div id="resultCard" class="result-card">
+    <div class="result-icon" id="resultIcon"></div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-subtitle" id="resultSubtitle"></div>
+
+    <div class="prob-bar-wrap">
+      <div class="prob-label">
+        <span>Approval Probability</span>
+        <span id="probPct">0%</span>
+      </div>
+      <div class="prob-bar">
+        <div class="prob-fill" id="probFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="result-details">
+      <div class="detail-item">
+        <div class="detail-label">Loan Amount</div>
+        <div class="detail-value" id="d-loan"></div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Interest Rate</div>
+        <div class="detail-value" id="d-rate"></div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">FICO Score</div>
+        <div class="detail-value" id="d-fico"></div>
+      </div>
+    </div>
+
+    <br/>
+    <button class="btn-reset" onclick="resetForm()">← Start New Application</button>
+  </div>
+</div>
+
+<footer>
+  Built with <strong>SAS Viya Model Studio</strong> · loan_17_18 Champion Model · Logistic Regression
+</footer>
+
+<script>
+  // ── CONFIG ──────────────────────────────────────────────
+  // Replace this with your actual SAS Viya MAS endpoint URL
+  const SAS_VIYA_API_URL = "https://YOUR-VIYA-SERVER/microanalyticScore/modules/loan_model/steps/execute";
+  // ────────────────────────────────────────────────────────
+
+  const form = document.getElementById('loanForm');
+  const formSection = document.getElementById('formSection');
+  const resultSection = document.getElementById('result-section');
+  const loading = document.getElementById('loadingOverlay');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    const data = collectFormData();
+    showLoading();
+
+    try {
+      // ── REAL API CALL (uncomment when SAS Viya is ready) ──
+      // const response = await fetch(SAS_VIYA_API_URL, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Authorization': 'Bearer YOUR_TOKEN_HERE'
+      //   },
+      //   body: JSON.stringify({ inputs: buildSASInputs(data) })
+      // });
+      // const result = await response.json();
+      // const approved = result.outputs.I_loan_status === '1';
+      // const prob = result.outputs.P_loan_status1;
+
+      // ── DEMO SCORING (remove when SAS Viya is connected) ──
+      await new Promise(r => setTimeout(r, 2200));
+      const score = scoringLogic(data);
+      const approved = score.approved;
+      const prob = score.probability;
+
+      hideLoading();
+      showResult(approved, prob, data);
+
+    } catch (err) {
+      hideLoading();
+      alert('Connection error. Please check your SAS Viya API endpoint.');
+      console.error(err);
+    }
+  });
+
+  function collectFormData() {
+    const f = form;
+    return {
+      loan_amnt: +f.loan_amnt.value,
+      term: f.term.value,
+      int_rate: +f.int_rate.value,
+      dti: +f.dti.value,
+      fico_score: +f.fico_score.value,
+      annual_inc: +f.annual_inc.value,
+      emp_length: +f.emp_length.value,
+      home_ownership: f.home_ownership.value,
+      verification_status: f.verification_status.value,
+      purpose: f.purpose.value,
+      sub_grade: f.sub_grade.value,
+      credit_history_years: +f.credit_history_years.value,
+      inq_last_6mths: +f.inq_last_6mths.value,
+      open_acc: +f.open_acc.value,
+      total_acc: +f.total_acc.value,
+      mort_acc: +f.mort_acc.value,
+      revol_bal: +f.revol_bal.value,
+      revol_util: +f.revol_util.value,
+      num_rev_tl_bal_gt_0: +f.num_rev_tl_bal_gt_0.value,
+      tot_hi_cred_lim: +f.tot_hi_cred_lim.value,
+      delinq_2yrs: +f.delinq_2yrs.value,
+      pub_rec: +f.pub_rec.value,
+      issue_month: +f.issue_month.value,
+      issue_year: +f.issue_year.value,
+      mths_since_recent_bc: +f.mths_since_recent_bc.value,
+      bc_open_to_buy: +f.bc_open_to_buy.value
+    };
+  }
+
+  function buildSASInputs(data) {
+    // Maps form data to exact SAS Viya MAS input format
+    return [
+      { name: "loan_amnt", value: data.loan_amnt },
+      { name: "int_rate", value: data.int_rate },
+      { name: "dti", value: data.dti },
+      { name: "fico_score", value: data.fico_score },
+      { name: "annual_inc", value: data.annual_inc },
+      { name: "emp_length", value: data.emp_length },
+      { name: "home_ownership", value: data.home_ownership },
+      { name: "verification_status", value: data.verification_status },
+      { name: "Purpose", value: data.purpose },
+      { name: "sub_grade", value: data.sub_grade },
+      { name: "term", value: data.term },
+      { name: "credit_history_years", value: data.credit_history_years },
+      { name: "inq_last_6mths", value: data.inq_last_6mths },
+      { name: "open_acc", value: data.open_acc },
+      { name: "total_acc", value: data.total_acc },
+      { name: "mort_acc", value: data.mort_acc },
+      { name: "revol_bal", value: data.revol_bal },
+      { name: "revol_util", value: data.revol_util },
+      { name: "num_rev_tl_bal_gt_0", value: data.num_rev_tl_bal_gt_0 },
+      { name: "tot_hi_cred_lim", value: data.tot_hi_cred_lim },
+      { name: "delinq_2yrs", value: data.delinq_2yrs },
+      { name: "pub_rec", value: data.pub_rec },
+      { name: "issue_month", value: data.issue_month },
+      { name: "issue_year", value: data.issue_year },
+      { name: "mths_since_recent_bc", value: data.mths_since_recent_bc },
+      { name: "bc_open_to_buy", value: data.bc_open_to_buy }
+    ];
+  }
+
+  // Demo scoring logic (mirrors your model's key variables)
+  function scoringLogic(d) {
+    let score = 0;
+    if (d.fico_score >= 750) score += 30;
+    else if (d.fico_score >= 700) score += 20;
+    else if (d.fico_score >= 650) score += 10;
+    else score -= 15;
+    if (d.int_rate < 8) score += 20;
+    else if (d.int_rate < 15) score += 10;
+    else if (d.int_rate > 22) score -= 20;
+    if (d.dti < 15) score += 15;
+    else if (d.dti < 25) score += 5;
+    else score -= 10;
+    if (d.term === '36 months') score += 10;
+    if (d.delinq_2yrs === 0) score += 10;
+    else score -= (d.delinq_2yrs * 5);
+    if (d.inq_last_6mths === 0) score += 5;
+    else score -= (d.inq_last_6mths * 3);
+    if (d.mths_since_recent_bc > 12) score += 10;
+    if (d.credit_history_years > 5) score += 8;
+    const rawProb = 1 / (1 + Math.exp(-score * 0.08));
+    return { approved: rawProb >= 0.5, probability: parseFloat(rawProb.toFixed(4)) };
+  }
+
+  function showResult(approved, prob, data) {
+    formSection.style.display = 'none';
+    resultSection.style.display = 'block';
+
+    const card = document.getElementById('resultCard');
+    card.className = 'result-card ' + (approved ? 'approved' : 'rejected');
+    document.getElementById('resultIcon').textContent = approved ? '✓' : '✕';
+    document.getElementById('resultTitle').textContent = approved ? 'Approved' : 'Not Approved';
+    document.getElementById('resultSubtitle').textContent = approved
+      ? 'Congratulations! Based on your profile, you are eligible for this loan.'
+      : 'Based on your profile, this application does not meet the current criteria.';
+
+    const pct = Math.round(prob * 100);
+    document.getElementById('probPct').textContent = pct + '%';
+    setTimeout(() => {
+      document.getElementById('probFill').style.width = pct + '%';
+    }, 300);
+
+    document.getElementById('d-loan').textContent = '$' + data.loan_amnt.toLocaleString();
+    document.getElementById('d-rate').textContent = data.int_rate + '%';
+    document.getElementById('d-fico').textContent = data.fico_score;
+
+    // Update step indicators
+    ['step1-ind','step2-ind','step3-ind'].forEach(id => {
+      document.getElementById(id).className = 'step-item done';
+    });
+    document.getElementById('step4-ind').className = 'step-item active';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetForm() {
+    form.reset();
+    formSection.style.display = 'block';
+    resultSection.style.display = 'none';
+    ['step1-ind','step2-ind','step3-ind'].forEach((id,i) => {
+      document.getElementById(id).className = i === 0 ? 'step-item active' : 'step-item';
+    });
+    document.getElementById('step4-ind').className = 'step-item';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function validateForm() {
+    let valid = true;
+    form.querySelectorAll('[required]').forEach(el => {
+      if (!el.value) { el.classList.add('error'); valid = false; }
+      else el.classList.remove('error');
+    });
+    if (!valid) {
+      form.querySelector('.error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return valid;
+  }
+
+  function showLoading() { loading.classList.add('active'); }
+  function hideLoading() { loading.classList.remove('active'); }
+</script>
+</body>
+</html>
