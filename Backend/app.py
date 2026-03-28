@@ -8,9 +8,8 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Allows webpage to talk to this backend
+CORS(app)  
 
-# ── HEALTH CHECK ──────────────────────────────────────────
 @app.route("/", methods=["GET"])
 def home():
     return jsonify({
@@ -19,22 +18,22 @@ def home():
         "database": "Snowflake LOAN_DB"
     })
 
-# ── MAIN ENDPOINT: Score a loan application ───────────────
+ 
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        # 1. Get form data from webpage
+      
         data = request.get_json()
         print(f" Received application: {data}")
 
         if not data:
             return jsonify({"error": "No data received"}), 400
 
-        # 2. Send to SAS Viya model for scoring
+       
         result = score_application(data)
         print(f"🤖 SAS Viya result: {result}")
 
-        # 3. Save application + result to Snowflake
+        
         save_application(
             data=data,
             prediction=result["prediction"],
@@ -42,7 +41,7 @@ def predict():
         )
         print(" Saved to Snowflake")
 
-        # 4. Return result to webpage
+        
         return jsonify({
             "success": True,
             "approved": result["approved"],
@@ -57,7 +56,7 @@ def predict():
             "error": str(e)
         }), 500
 
-# ── GET ALL APPLICATIONS ──────────────────────────────────
+
 @app.route("/applications", methods=["GET"])
 def applications():
     try:
@@ -70,7 +69,7 @@ def applications():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ── RUN SERVER ────────────────────────────────────────────
+
 if __name__ == "__main__":
     port = int(os.getenv("FLASK_PORT", 5000))
     print(f"""
