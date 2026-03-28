@@ -817,10 +817,9 @@
 </footer>
 
 <script>
-  // ── CONFIG ──────────────────────────────────────────────
-  // Replace this with your actual SAS Viya MAS endpoint URL
-  const SAS_VIYA_API_URL = "https://YOUR-VIYA-SERVER/microanalyticScore/modules/loan_model/steps/execute";
-  // ────────────────────────────────────────────────────────
+  
+  const SAS_VIYA_API_URL = "https://vfl-026.engage.sas.com/microanalyticScore/modules/lr_step__pipeline_2_/steps/score";
+ 
 
   const form = document.getElementById('loanForm');
   const formSection = document.getElementById('formSection');
@@ -835,34 +834,29 @@
     showLoading();
 
     try {
-      // ── REAL API CALL (uncomment when SAS Viya is ready) ──
-      // const response = await fetch(SAS_VIYA_API_URL, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': 'Bearer YOUR_TOKEN_HERE'
-      //   },
-      //   body: JSON.stringify({ inputs: buildSASInputs(data) })
-      // });
-      // const result = await response.json();
-      // const approved = result.outputs.I_loan_status === '1';
-      // const prob = result.outputs.P_loan_status1;
+      // Send to Flask backend
+      const response = await fetch('http://localhost:5000/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
 
-      // ── DEMO SCORING (remove when SAS Viya is connected) ──
-      await new Promise(r => setTimeout(r, 2200));
-      const score = scoringLogic(data);
-      const approved = score.approved;
-      const prob = score.probability;
+      const result = await response.json();
 
       hideLoading();
-      showResult(approved, prob, data);
+
+      if (result.success) {
+        showResult(result.approved, result.probability, data);
+      } else {
+        alert('Error: ' + result.error);
+      }
 
     } catch (err) {
       hideLoading();
-      alert('Connection error. Please check your SAS Viya API endpoint.');
+      alert('Cannot connect to backend. Make sure Flask is running!');
       console.error(err);
     }
-  });
+});
 
   function collectFormData() {
     const f = form;
